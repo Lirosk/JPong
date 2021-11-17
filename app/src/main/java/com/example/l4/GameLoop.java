@@ -1,11 +1,14 @@
 package com.example.l4;
 
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.view.SurfaceHolder;
 
+import androidx.core.content.ContextCompat;
+
 public class GameLoop extends Thread{
-    private final double MAX_UPS = 30;
-    private final double UPS_PREIOD = 1e3/MAX_UPS;
+    public static final float MAX_UPS = 30;
+    public static final float UPS_PERIOD = 1e3f/MAX_UPS;
 
     private boolean isRunning = false;
 
@@ -36,35 +39,55 @@ public class GameLoop extends Thread{
         long elapsedTime;
         long sleepTime;
 
-        Canvas canvas = null;
+        Canvas canvas;
         startTime = System.currentTimeMillis();
         while (isRunning) {
+            canvas = surfaceHolder.lockCanvas();
             try {
-                canvas = surfaceHolder.lockCanvas();
-                if (canvas != null) {
-                    synchronized (surfaceHolder) {
-                        game.update();
-                        updateCount++;
-                        game.draw(canvas);
-                    }
-                }
-            }
-            catch (IllegalArgumentException e) {
+                game.update();
+                updateCount++;
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-            finally {
+            try {
                 if (canvas != null) {
-                    try {
-                        surfaceHolder.unlockCanvasAndPost(canvas);
-                        frameCount++;
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    game.draw(canvas);
+                    frameCount++;
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            if (canvas != null) {
+                surfaceHolder.unlockCanvasAndPost(canvas);
             }
 
+//            canvas = surfaceHolder.lockCanvas();
+//            try {
+//                canvas = surfaceHolder.lockCanvas();
+//                if (canvas != null) {
+//                    synchronized (surfaceHolder) {
+//                        game.update();
+//                        updateCount++;
+//                        game.draw(canvas);
+//                    }
+//                }
+//            }
+//            catch (IllegalArgumentException e) {
+//                e.printStackTrace();
+//            }
+//            finally {
+//                if (canvas != null) {
+//                    try {
+//                        surfaceHolder.unlockCanvasAndPost(canvas);
+//                        frameCount++;
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }
+
             elapsedTime = System.currentTimeMillis() - startTime;
-            sleepTime = (long) (updateCount * UPS_PREIOD - elapsedTime);
+            sleepTime = (long) (updateCount * UPS_PERIOD - elapsedTime);
             if (sleepTime > 0) {
                 try {
                     sleep(sleepTime);
@@ -77,7 +100,7 @@ public class GameLoop extends Thread{
                 game.update();
                 updateCount++;
                 elapsedTime = System.currentTimeMillis() - startTime;
-                sleepTime = (long) (updateCount * UPS_PREIOD - elapsedTime);
+                sleepTime = (long) (updateCount * UPS_PERIOD - elapsedTime);
             }
 
             elapsedTime = System.currentTimeMillis() - startTime;

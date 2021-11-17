@@ -1,45 +1,21 @@
 package com.example.l4;
 
 import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Paint;
 
-import androidx.core.content.ContextCompat;
+public class Player extends Rectangle {
+    private static final float SPEED_PIXELS_PER_SECOND = 400;
+    private static final float MAX_SPEED = SPEED_PIXELS_PER_SECOND / GameLoop.MAX_UPS;
+    private float velocityX;
+    private final MovementListener movementListener;
 
-public class Player {
-    private float x;
-    private float y;
-    private float width;
-    private float height;
-    private Paint paint;
+    public Player(Context context, MovementListener movementListener, float x, float y, float width, float height) {
+        super(context, x, y, width, height);
+        this.movementListener = movementListener;
 
-    public Player(Context context, float posX, float posY, float width, float height) {
-        this.x = posX;
-        this.y = posY;
-        this.width = width;
-        this.height = height;
-
-        paint = new Paint();
-        int color = ContextCompat.getColor(context, R.color.player);
-        paint.setColor(color);
     }
 
-    public void draw(Canvas canvas) {
-        canvas.drawRect(
-                x -width/2,
-                y -height/2,
-                x +width/2,
-                y +height/2,
-                paint
-        );
-    }
-
+    @Override
     public void update() {
-
-    }
-
-    public void setPosition(float x, float y) {
-        this.x = x;
-        this.y = y;
+        x += movementListener.getActuatorX() * MAX_SPEED;
     }
 }

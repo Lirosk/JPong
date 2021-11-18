@@ -3,11 +3,15 @@ package com.example.l4.GameObjects;
 import android.graphics.Canvas;
 
 import com.example.l4.Engine.Game;
+import com.example.l4.Engine.GameLoop;
 import com.example.l4.GameObjects.Shapes.Circle;
 import com.example.l4.GameObjects.Shapes.Rectangle;
 import com.example.l4.Point;
 
 public abstract class GameObject {
+    public static final float SPEED_PIXELS_PER_SECOND = 400;
+    public static final float MAX_SPEED = SPEED_PIXELS_PER_SECOND / GameLoop.MAX_UPS;
+
     private static final Object locker = new Object();
     protected float mass;
     protected float x;
@@ -198,8 +202,18 @@ public abstract class GameObject {
                     );
                 }
 
-                this.velocity = new Point(rx1, ry1);
-                gameObject.velocity = new Point(rx2, ry2);
+                Point rv1 = new Point(rx1, ry1);
+                Point rv2 = new Point(rx2, ry2);
+
+                if (rv1.getLen() > this.MAX_SPEED) {
+                    rv1.setLen(this.MAX_SPEED);
+                }
+                if (rv2.getLen() > gameObject.MAX_SPEED) {
+                    rv2.setLen(gameObject.MAX_SPEED);
+                }
+
+                this.velocity = rv1;
+                gameObject.velocity = rv2;
 
                 while (collides(gameObject) || gameObject.collides(this)) {
                     if (m1 != 0) {

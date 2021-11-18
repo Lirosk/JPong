@@ -76,6 +76,21 @@ public class Point {
         return new Point(nx, ny);
     }
 
+    public float getLen() {
+        return (float) Math.sqrt(x*x + y*y);
+    }
+
+    public Point setLen(float len) {
+        float curLen = getLen();
+        float x = this.x;
+        float y = this.y;
+        x /= curLen;
+        y /= curLen;
+        x *= len;
+        y *= len;
+        return new Point(x, y);
+    }
+
     public void draw(Canvas canvas) {
         Paint paint = new Paint();
         if (counter % 3 == 0) {

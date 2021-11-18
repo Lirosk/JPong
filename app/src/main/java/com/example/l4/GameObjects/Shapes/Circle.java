@@ -8,9 +8,6 @@ import com.example.l4.Engine.GameLoop;
 import com.example.l4.Point;
 
 public class Circle extends Shape {
-    private static final float SPEED_PIXELS_PER_SECOND = 400;
-    private static final float MAX_SPEED = SPEED_PIXELS_PER_SECOND / GameLoop.MAX_UPS;
-
     protected float radius;
 
     public Circle(Context context, int colorId, float x, float y, float radius, float weight) {

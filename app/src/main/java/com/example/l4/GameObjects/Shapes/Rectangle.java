@@ -141,8 +141,8 @@ public class Rectangle extends Shape {
         float y = n.y-vY;
 
         if (
-            0 - Game.ERR < y && y < height + Game.ERR &&
-            0 - Game.ERR < x && x < width + Game.ERR
+            0 < y && y < height &&
+            0 < x && x < width
         ) {
             if (height > width) {
                 return (float) Math.PI/2;
@@ -151,10 +151,10 @@ public class Rectangle extends Shape {
                 return 0;
             }
         }
-        if (0 - Game.ERR < y && y < height + Game.ERR) {
+        if (0 < y && y < height) {
             return (float) Math.PI/2;
         }
-        if (0 - Game.ERR < x && x < width + Game.ERR) {
+        if (0 < x && x < width) {
             return (float) 0;
         }
         if (Math.abs(x) < Game.ERR) {

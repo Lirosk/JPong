@@ -85,7 +85,7 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
 //        gameObjects.add(MovingCircle.withRandChars(context, width, height));
 //        gameObjects.add(MovingCircle.withRandChars(context, width, height));
 //        gameObjects.add(new MovingCircle(context, R.color.enemy, 700, 600, 50, new Point(-15, 20), 1));
-        movingCircle = new MovingCircle(context, R.color.enemy, 100, height-150, 50, new Point(10, 0), 1);
+        movingCircle = new MovingCircle(context, R.color.enemy, 100, 1663.5f, 50, new Point(10, 0), 1);
         gameObjects.add(movingCircle);
 
         gameLoop = new GameLoop(this, surfaceHolder);

@@ -10,8 +10,8 @@ import com.example.l4.Point;
 public class Circle extends Shape {
     protected float radius;
 
-    public Circle(Context context, int colorId, float x, float y, float radius, float weight) {
-        super(context, colorId, x, y, weight);
+    public Circle(Context context, int colorId, float x, float y, float radius, float mass) {
+        super(context, colorId, x, y, mass);
         this.radius = radius;
     }
 

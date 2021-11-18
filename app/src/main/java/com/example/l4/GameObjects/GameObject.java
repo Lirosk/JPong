@@ -7,9 +7,10 @@ import com.example.l4.Engine.GameLoop;
 import com.example.l4.GameObjects.Shapes.Circle;
 import com.example.l4.GameObjects.Shapes.Rectangle;
 import com.example.l4.Point;
+import com.example.l4.Utils;
 
 public abstract class GameObject {
-    public static final float SPEED_PIXELS_PER_SECOND = 400;
+    public static final float SPEED_PIXELS_PER_SECOND = 200;
     public static final float MAX_SPEED = SPEED_PIXELS_PER_SECOND / GameLoop.MAX_UPS;
 
     private static final Object locker = new Object();
@@ -54,10 +55,32 @@ public abstract class GameObject {
         this.velocity = new Point(x, y);
     }
 
+    public static int moved = 0;
     public abstract void draw(Canvas canvas);
     public void update() {
         x += velocity.x;
         y += velocity.y;
+        if (0 > x || x > Game.width || 0 > y || y > Game.height) {
+            if (moved > 100) {
+                x = Utils.rand(100, Game.width - 100);
+                y = Utils.rand(100, Game.height/2f - 100);
+                moved = 0;
+                return;
+            }
+            while (0 > x) {
+                x += MAX_SPEED * 3;
+            }
+            while (x > Game.width) {
+                x -= MAX_SPEED * 3;
+            }
+            while (0 > y) {
+                y += MAX_SPEED * 3;
+            }
+            while (y > Game.height) {
+                y -= MAX_SPEED * 3;
+            }
+            moved++;
+        }
     }
 
     protected abstract Point nearestPoint(float x, float y);

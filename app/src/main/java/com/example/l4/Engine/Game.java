@@ -37,8 +37,8 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
 
     private final int numCores;
 
-    public int width;
-    public int height;
+    public static int width;
+    public static int height;
 
     ArrayList<GameObject> gameObjects;
     public static ArrayList<Point> points = new ArrayList<>();
@@ -69,10 +69,30 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
 
         int boundColor = R.color.border;
         float woh = 20;
-        Rectangle topBound = new Rectangle(context, boundColor, width/2f, 1, (float) width, woh, 0);
-        Rectangle leftBound = new Rectangle(context, boundColor, 1, height/2f, woh, (float) height, 0);
-        Rectangle rightBound = new Rectangle(context, boundColor, width-1, height/2f, woh, (float) height, 0);
-        Rectangle bottomBound = new Rectangle(context, boundColor, width/2f, (float) height-1, (float) width, woh, 0);
+        Rectangle topBound = new Rectangle(context, boundColor, width/2f, 1, (float) width, woh, 0) {
+            @Override
+            public void update() {
+
+            }
+        };
+        Rectangle leftBound = new Rectangle(context, boundColor, 1, height/2f, woh, (float) height, 0) {
+            @Override
+            public void update() {
+
+            }
+        };
+        Rectangle rightBound = new Rectangle(context, boundColor, width-1, height/2f, woh, (float) height, 0) {
+            @Override
+            public void update() {
+
+            }
+        };
+        Rectangle bottomBound = new Rectangle(context, boundColor, width/2f, (float) height-1, (float) width, woh, 0) {
+            @Override
+            public void update() {
+
+            }
+        };
 
         gameObjects.add(topBound);
         gameObjects.add(leftBound);
@@ -80,10 +100,10 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
         gameObjects.add(bottomBound);
 
 //        movingCircle = MovingCircle.withRandChars(context, width, height);
-//        gameObjects.add(MovingCircle.withRandChars(context, width, height));
-//        gameObjects.add(MovingCircle.withRandChars(context, width, height));
-//        gameObjects.add(MovingCircle.withRandChars(context, width, height));
-//        gameObjects.add(MovingCircle.withRandChars(context, width, height));
+        gameObjects.add(MovingCircle.withRandChars(context, width, height, 25, 0.25f));
+        gameObjects.add(MovingCircle.withRandChars(context, width, height, 100, 4f));
+        gameObjects.add(MovingCircle.withRandChars(context, width, height));
+        gameObjects.add(MovingCircle.withRandChars(context, width, height));
 //        gameObjects.add(new MovingCircle(context, R.color.enemy, 700, 600, 50, new Point(-15, 20), 1));
         movingCircle = new MovingCircle(context, R.color.enemy, 100, 1663.5f, 50, new Point(10, 0), 1);
         gameObjects.add(movingCircle);
@@ -117,8 +137,8 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
-        drawUPS(canvas);
-        drawFPS(canvas);
+//        drawUPS(canvas);
+//        drawFPS(canvas);
 
         Game.canvas = canvas;
 

@@ -10,8 +10,8 @@ public class Rectangle extends Shape {
     protected final float width;
     protected final float height;
 
-    public Rectangle(Context context, int colorId, float x, float y, float width, float height, float weight) {
-        super(context, colorId, x, y, weight);
+    public Rectangle(Context context, int colorId, float x, float y, float width, float height, float mass) {
+        super(context, colorId, x, y, mass);
         this.width = width;
         this.height = height;
     }
@@ -25,11 +25,6 @@ public class Rectangle extends Shape {
                 y - height/2,
                 paint
         );
-    }
-
-    @Override
-    public void update() {
-
     }
 
     public float getHeight() {

@@ -1,10 +1,12 @@
-package com.example.l4;
+package com.example.l4.Engine;
 
-import android.content.res.Resources;
 import android.graphics.Canvas;
+import android.os.Build;
 import android.view.SurfaceHolder;
 
-import androidx.core.content.ContextCompat;
+import androidx.annotation.RequiresApi;
+
+import com.example.l4.Engine.Game;
 
 public class GameLoop extends Thread{
     public static final float MAX_UPS = 30;
@@ -28,6 +30,7 @@ public class GameLoop extends Thread{
         start();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void run() {
         super.run();

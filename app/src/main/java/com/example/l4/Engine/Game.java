@@ -99,13 +99,13 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
         gameObjects.add(rightBound);
         gameObjects.add(bottomBound);
 
-//        movingCircle = MovingCircle.withRandChars(context, width, height);
-        gameObjects.add(MovingCircle.withRandChars(context, width, height, 25, 0.25f));
-        gameObjects.add(MovingCircle.withRandChars(context, width, height, 100, 4f));
-        gameObjects.add(MovingCircle.withRandChars(context, width, height));
-        gameObjects.add(MovingCircle.withRandChars(context, width, height));
-//        gameObjects.add(new MovingCircle(context, R.color.enemy, 700, 600, 50, new Point(-15, 20), 1));
-        movingCircle = new MovingCircle(context, R.color.enemy, 100, 1663.5f, 50, new Point(10, 0), 1);
+        movingCircle = MovingCircle.withRandChars(context, width, height);
+//        gameObjects.add(MovingCircle.withRandChars(context, width, height, 25, 0.25f));
+//        gameObjects.add(MovingCircle.withRandChars(context, width, height, 100, 4f));
+//        gameObjects.add(MovingCircle.withRandChars(context, width, height, 50, 1));
+//        gameObjects.add(MovingCircle.withRandChars(context, width, height, 150, 9));
+//        gameObjects.add(MovingCircle.withRandChars(context, width, height));
+//        gameObjects.add(MovingCircle.withRandChars(context, width, height));
         gameObjects.add(movingCircle);
 
         gameLoop = new GameLoop(this, surfaceHolder);
@@ -149,6 +149,7 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
         for (Point point: points) {
             point.draw(canvas);
         }
+        points.clear();
     }
 
     public static Canvas canvas;
@@ -180,30 +181,4 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
             gameObjects.subList(i + 1, gameObjects.size()).parallelStream().forEach(gameObjects.get(i)::collide);
         }
     }
-
-//    public void checkCollision() {
-//        //bounce ball off top & bottom window edges
-//        if(movingCircle.getX() <=0) {
-//            movingCircle.setVelocityX(-movingCircle.getVelocityX());
-//        }
-//        if(movingCircle.getX() >= height-movingCircle.getRadius()*2) {
-//            movingCircle.setVelocityX(-movingCircle.getVelocityX());
-//        }
-//        //bounce ball off paddles
-//        if(movingCircle.collides(player)) {
-//            movingCircle.setVelocityY(-movingCircle.getVelocityY());
-//            movingCircle.setVelocityY(movingCircle.getVelocityY() + 1); //optional for more difficulty
-//            if(movingCircle.getVelocityX()>0)
-//                movingCircle.setVelocityX(movingCircle.getVelocityX() + 1); //optional for more difficulty
-//            else
-//                movingCircle.setVelocityX(movingCircle.getVelocityX() - 1);
-//            movingCircle.setVelocityY(movingCircle.getVelocityY());
-//            movingCircle.setVelocityX(movingCircle.getVelocityX());
-//        }
-//        //stops paddles at window edges
-//        if(player.getX() <= 0)
-//            player.setY(0);
-//        if(player.getX() >= (width-player.getWidth()))
-//            player.setX(width-player.getWidth());
-//    }
 }

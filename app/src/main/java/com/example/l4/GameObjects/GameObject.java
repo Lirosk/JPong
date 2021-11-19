@@ -10,7 +10,7 @@ import com.example.l4.Point;
 import com.example.l4.Utils;
 
 public abstract class GameObject {
-    public static final float SPEED_PIXELS_PER_SECOND = 200;
+    public static final float SPEED_PIXELS_PER_SECOND = 50;
     public static final float MAX_SPEED = SPEED_PIXELS_PER_SECOND / GameLoop.MAX_UPS;
 
     private static final Object locker = new Object();
@@ -55,31 +55,67 @@ public abstract class GameObject {
         this.velocity = new Point(x, y);
     }
 
-    public static int moved = 0;
+    public Point coordinates() {
+        return new Point(x, y);
+    }
+
+    public int moved = 0;
     public abstract void draw(Canvas canvas);
+    public static final float ERR_MUL = 10;
+
+    public void randomMove() {
+        x = Utils.rand(100, Game.width - 100);
+        y = Utils.rand(100, Game.height/2f - 100);
+    }
+
     public void update() {
         x += velocity.x;
         y += velocity.y;
-        if (0 > x || x > Game.width || 0 > y || y > Game.height) {
-            if (moved > 100) {
-                x = Utils.rand(100, Game.width - 100);
-                y = Utils.rand(100, Game.height/2f - 100);
-                moved = 0;
-                return;
-            }
+        if (
+                0 + Game.ERR * ERR_MUL> x ||
+                x > Game.width - Game.ERR * ERR_MUL ||
+                0 + Game.ERR * ERR_MUL > y ||
+                y > Game.height - Game.ERR * ERR_MUL) {
             while (0 > x) {
-                x += MAX_SPEED * 3;
+                x += MAX_SPEED;
+                moved++;
+                if (moved > 100) {
+                    randomMove();
+                    moved = 0;
+                    return;
+                }
             }
             while (x > Game.width) {
-                x -= MAX_SPEED * 3;
+                x -= MAX_SPEED;
+                moved++;
+                if (moved > 100) {
+                    randomMove();
+                    moved = 0;
+                    return;
+                }
             }
             while (0 > y) {
-                y += MAX_SPEED * 3;
+                y += MAX_SPEED;
+                moved++;
+                if (moved > 100) {
+                    randomMove();
+                    moved = 0;
+                    return;
+                }
             }
             while (y > Game.height) {
-                y -= MAX_SPEED * 3;
+                y -= MAX_SPEED;
+                moved++;
+                if (moved > 100) {
+                    randomMove();
+                    moved = 0;
+                    return;
+                }
             }
-            moved++;
+            moved = 0;
+        }
+        if (velocity.getLen() > MAX_SPEED) {
+            velocity.setLen(MAX_SPEED);
         }
     }
 
@@ -115,6 +151,9 @@ public abstract class GameObject {
 
         if (c1 || c2)
         {
+            Game.points.add(p1);
+            Game.points.add(p2);
+
             synchronized (locker) {
                 // momentum conservation law
                 float vx1 = velocity.x;
@@ -123,8 +162,11 @@ public abstract class GameObject {
                 float vx2 = gameObject.velocity.x;
                 float vy2 = gameObject.velocity.y;
 
-                float v1 = (float) Math.sqrt(vx1 * vx1 + vy1 * vy1);
-                float v2 = (float) Math.sqrt(vx2 * vx2 + vy2 * vy2);
+                float vl1 = (float) Math.sqrt(vx1 * vx1 + vy1 * vy1);
+                float vl2 = (float) Math.sqrt(vx2 * vx2 + vy2 * vy2);
+
+                Point v1 = velocity;
+                Point v2 = gameObject.velocity;
 
                 float m1 = this.mass;
                 float m2 = gameObject.mass;
@@ -132,25 +174,10 @@ public abstract class GameObject {
                 float theta1 = velocity.angle();
                 float theta2 = gameObject.velocity.angle();
 
-//                float phi = surfaceAngle(p1);
-//                float dphi = Math.abs(phi - theta2);
+                Point x1 = coordinates();
+                Point x2 = gameObject.coordinates();
 
                 float rx1 = vx1, ry1 = vy1, rx2 = vx2, ry2 = vy2;
-//                phi = surfaceAngle(p1);
-//                if (Math.abs(phi) < Game.ERR) {
-//                    ry2 = -vy2;
-//                }
-//                else if (Math.abs(Math.abs(phi) - Math.PI/2) < Game.ERR) {
-//                    rx2 = - vx2;
-//                }
-//                else {
-//                    rx1 = -vx1;
-//                    ry1 = -vy1;
-//                    rx2 = -vx2;
-//                    ry2 = -vy2;
-//                }
-
-//
                 float phi = (float) Math.abs(surfaceAngle(p1)-theta2);
 
                 if (m1 == 0) {
@@ -161,17 +188,9 @@ public abstract class GameObject {
                     else if (Math.abs(Math.abs(phi) - Math.PI/2) < Game.ERR) {
                         rx2 = - vx2;
                     }
-                    /*rx1 = vx1;
-                    ry1 = vy1;
-
-                    rx2 = (float)(
-                            v2*Math.cos(theta2-phi)*Math.cos(phi)
-                            +v2*Math.sin(theta2-phi)*Math.cos(phi+Math.PI/2)
-                    );
-                    ry2 = (float)(
-                            v2*Math.cos(theta2-phi)*Math.sin(phi)
-                            +v2*Math.sin(theta2-phi)*Math.sin(phi+Math.PI/2)
-                    );*/
+//                    float rlen = (float) (vl2*Math.sqrt(m1*m1+m2*m2+2*m1*m2*Math.cos(phi)))/(m1+m2);
+//                    vx2 = (float) (rlen * Math.cos(phi));
+//                    vy2 = (float) (rlen * Math.sin(phi));
                 } else if (m2 == 0) {
                     phi = surfaceAngle(p2);
                     if (Math.abs(phi) < Game.ERR) {
@@ -180,48 +199,60 @@ public abstract class GameObject {
                     else if (Math.abs(Math.abs(phi) - Math.PI/2) < Game.ERR) {
                         rx1 = -vx1;
                     }
-                    /*rx1 = (float)(
-                            v1*Math.cos(theta1-phi)*Math.cos(phi)
-                            +v1*Math.sin(theta1-phi)*Math.cos(phi+Math.PI/2)
-                    );
-                    ry1 = (float)(
-                            v1*Math.cos(theta1-phi)*Math.sin(phi)
-                            +v1*Math.sin(theta1-phi)*Math.sin(phi+Math.PI/2)
-                    );
-
-                    rx2 = vx2;
-                    ry2 = vy2;*/
+//                    float rlen = (float) (vl1*Math.sqrt(m1*m1+m2*m2+2*m1*m2*Math.cos(phi)))/(m1+m2);
+//                    vx1 = (float) (rlen * Math.cos(phi));
+//                    vy1 = (float) (rlen * Math.sin(phi));
                 } else {
-//                    rx1 = vx2;
-//                    ry1 = vy2;
-//                    rx2 = vx1;
-//                    ry2 = vy1;
-                    double a1 = v1*Math.cos(theta1-phi)*(m1-m2)+2*m2*v2*Math.cos(theta2-phi);
+                    double a1 = vl1*Math.cos(theta1-phi)*(m1-m2)+2*m2*vl2*Math.cos(theta2-phi);
                     rx1 = (float)(
+//                        a1
+//                        *Math.cos(phi)
+//                        /(m1+m2)
+//                        +vl1*Math.sin(theta1-phi)*Math.cos(phi+Math.PI/2)
+
+                    (
                         a1
                         *Math.cos(phi)
-                        /(m1+m2)
-                        +v1*Math.sin(theta1-phi)*Math.cos(phi+Math.PI/2)
+                        +vl1*Math.sin(theta1-phi)*Math.cos(phi+Math.PI/2)
+                    )/(m1 + m2)
                     );
                     ry1 = (float)(
-                        a1
-                        *Math.sin(phi)
-                        /(m1+m2)
-                        +v1*Math.sin(theta1-phi)*Math.sin(phi+Math.PI/2)
+//                        a1
+//                        *Math.sin(phi)
+//                        /(m1+m2)
+//                        +vl1*Math.sin(theta1-phi)*Math.sin(phi+Math.PI/2)
+
+                            (
+                                    a1
+                                    *Math.sin(phi)
+                                    +vl1*Math.sin(theta1-phi)*Math.sin(phi+Math.PI/2)
+                            ) / (m1 + m2)
                     );
 
-                    double a2 = v2*Math.cos(theta2-phi)*(m2-m1)+2*m1*v1*Math.cos(theta1-phi);
+                    double a2 = vl2*Math.cos(theta2-phi)*(m2-m1)+2*m1*vl1*Math.cos(theta1-phi);
                     rx2 = (float)(
-                        a2
-                        *Math.cos(phi)
-                        /(m1+m2)
-                        +v2*Math.sin(theta2-phi)*Math.cos(phi+Math.PI/2)
+//                        a2
+//                        *Math.cos(phi)
+//                        /(m1+m2)
+//                        +vl2*Math.sin(theta2-phi)*Math.cos(phi+Math.PI/2)
+
+                            (
+                                    a2
+                                    *Math.cos(phi)
+                                    +vl2*Math.sin(theta2-phi)*Math.cos(phi+Math.PI/2)
+                            ) / (m1+m2)
                     );
                     ry2 = (float)(
-                        a2
-                        *Math.sin(phi)
-                        /(m1+m2)
-                        +v2*Math.sin(theta2-phi)*Math.sin(phi+Math.PI/2)
+//                        a2
+//                        *Math.sin(phi)
+//                        /(m1+m2)
+//                        +vl2*Math.sin(theta2-phi)*Math.sin(phi+Math.PI/2)
+
+                    (
+                            a2
+                            *Math.sin(phi)
+                            +vl2*Math.sin(theta2-phi)*Math.sin(phi+Math.PI/2)
+                    ) / (m1+m2)
                     );
                 }
 
@@ -245,7 +276,13 @@ public abstract class GameObject {
                     if (m2 != 0) {
                         gameObject.update();
                     }
+                    moved++;
+                    if (moved > 100) {
+                        gameObject.randomMove();
+                        moved = 0;
+                    }
                 }
+                moved = 0;
             }
         }
     }

@@ -1,7 +1,12 @@
 package com.example.l4.GameObjects;
 
 import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 
+import androidx.core.content.ContextCompat;
+
+import com.example.l4.Engine.Game;
 import com.example.l4.Engine.GameLoop;
 import com.example.l4.GameObjects.Shapes.Circle;
 import com.example.l4.Point;
@@ -11,7 +16,6 @@ import com.example.l4.Utils;
 public class MovingCircle extends Circle {
     public MovingCircle(Context context, int colorId, float x, float y, float radius, Point velocity, float mass) {
         super(context, colorId, x, y, radius, mass);
-
         this.velocity = velocity;
     }
 
@@ -22,9 +26,10 @@ public class MovingCircle extends Circle {
     }
 
     public static MovingCircle withRandChars(Context context, float width, float height) {
-        float movingCircleRadius = 50;
-        float movingCircleX = Utils.rand(2*movingCircleRadius, width - 2*movingCircleRadius);
-        float movingCircleY = Utils.rand(2*movingCircleRadius, height/2 - 2*movingCircleRadius);
+        float movingCircleRadius = Utils.rand(25, 200);
+        float mass = movingCircleRadius/50;
+        float movingCircleX = Utils.rand(2.2f*movingCircleRadius, width - 2.2f*movingCircleRadius);
+        float movingCircleY = Utils.rand(2.2f*movingCircleRadius, height/2 - 2.2f*movingCircleRadius);
 
         float movingCircleSpeed = Utils.rand(20, 40);
         float movingCircleMovementAngle = Utils.rand(210, 330);
@@ -32,7 +37,7 @@ public class MovingCircle extends Circle {
         float movingCircleVelocityX = (float) (movingCircleSpeed * Math.cos(movingCircleMovementAngle));
         float movingCircleVelocityY = (float) (movingCircleSpeed * Math.sin(movingCircleMovementAngle));
 
-        return new MovingCircle(context, R.color.enemy, movingCircleX, movingCircleY, movingCircleRadius, new Point(movingCircleVelocityX, movingCircleVelocityY), 1);
+        return new MovingCircle(context, R.color.enemy, movingCircleX, movingCircleY, movingCircleRadius, new Point(movingCircleVelocityX, movingCircleVelocityY), mass*mass);
     }
 
     public static MovingCircle withRandChars(Context context, float width, float height, float radius, float mass) {
@@ -42,9 +47,26 @@ public class MovingCircle extends Circle {
         return res;
     }
 
-//    @Override
-//    public void update() {
+    @Override
+    public void draw(Canvas canvas) {
+        super.draw(canvas);
+
+        float tmass =  Math.round(mass * 100f) / 100f;
+        String text = Integer.toString((int)tmass);
+        if (tmass == (float)((int)tmass)) {
+            text = Integer.toString((int)tmass);
+        }
+        Paint paint = new Paint();
+        int color = ContextCompat.getColor(Game.context, R.color.white);
+        paint.setColor(color);
+        paint.setTextSize(radius);
+        canvas.drawText(text, x-radius/3, y+radius/2, paint);
+    }
+
+    @Override
+    public void update() {
 //        setVelocityY(velocity.y);
-//        super.update();
-//    }
+        velocity = new Point(velocity.x, velocity.y + Math.abs(velocity.y*0.01f));
+        super.update();
+    }
 }

@@ -44,18 +44,6 @@ public class Rectangle extends Shape {
         float newX = x - vX;
         float newY = y - vY;
 
-        if (newX < 0 + Game.ERR && newY < 0 + Game.ERR) {
-            return new Point(this.x - width/2, this.y - height/2);
-        }
-        if (newX > 0 - Game.ERR && newY < 0 + Game.ERR) {
-            return new Point(this.x + width/2, this.y - height/2);
-        }
-        if (newX > width - Game.ERR && newY > height - Game.ERR) {
-            return new Point(this.x + width/2, this.y + height/2);
-        }
-        if (newX < 0 + Game.ERR && newY > height - Game.ERR) {
-            return new Point(this.x - width/2, this.y + height/2);
-        }
         if (0 - Game.ERR < newX && newX < width + Game.ERR) {
             if (newY < 0 + Game.ERR) {
                 return new Point(x, this.y - height/2);
@@ -77,6 +65,18 @@ public class Rectangle extends Shape {
             if (0 - Game.ERR < newX && newX < width + Game.ERR) {
                 return new Point(x, y);
             }
+        }
+        if (newX < 0 + Game.ERR && newY < 0 + Game.ERR) {
+            return new Point(this.x - width/2, this.y - height/2);
+        }
+        if (newX > 0 - Game.ERR && newY < 0 + Game.ERR) {
+            return new Point(this.x + width/2, this.y - height/2);
+        }
+        if (newX > width - Game.ERR && newY > height - Game.ERR) {
+            return new Point(this.x + width/2, this.y + height/2);
+        }
+        if (newX < 0 + Game.ERR && newY > height - Game.ERR) {
+            return new Point(this.x - width/2, this.y + height/2);
         }
 
         return new Point(x, y);

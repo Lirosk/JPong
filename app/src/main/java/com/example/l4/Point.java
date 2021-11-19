@@ -43,6 +43,10 @@ public class Point {
         return new Point(x * a, y * a);
     }
 
+    public float innerProduct(Point point) {
+        return x*point.x + y* point.y;
+    }
+
     public Point div(float a) {
         return new Point(x / a, y / a);
     }
@@ -104,5 +108,14 @@ public class Point {
         }
         counter ++;
         canvas.drawCircle(x, y, 10, paint);
+    }
+
+    public Point normalize() {
+        float curLen = getLen();
+        float x = this.x;
+        float y = this.y;
+        x /= curLen;
+        y /= curLen;
+        return new Point(x, y);
     }
 }

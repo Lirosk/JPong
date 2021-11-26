@@ -8,7 +8,7 @@ import androidx.core.content.ContextCompat;
 
 import com.example.l4.R;
 
-public class Score {
+public class Score implements Drawable {
     private float x;
     private float y;
     private int score;

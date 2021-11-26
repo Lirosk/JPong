@@ -16,33 +16,44 @@ import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 
 import com.example.l4.Activities.ScoresActivity;
+import com.example.l4.Game.Drawable;
+import com.example.l4.Game.GameEvents.GameEventsManager;
 import com.example.l4.Game.GameObjects.GameObject;
 import com.example.l4.Game.GameObjects.MovingCircle;
 import com.example.l4.Game.GameObjects.Player;
 import com.example.l4.Game.GameObjects.Shapes.Rectangle;
+import com.example.l4.Game.Updatable;
 import com.example.l4.Listeners.MovementListener;
 import com.example.l4.Point;
 import com.example.l4.R;
 import com.example.l4.Game.Score;
 
 import java.util.ArrayList;
+import java.util.concurrent.locks.ReentrantLock;
 
-public class Game extends SurfaceView implements SurfaceHolder.Callback {
+public class Game extends SurfaceView implements SurfaceHolder.Callback, Drawable, Updatable {
     public static final float ERR = 1;
 
     private final GameLoop gameLoop;
-    private final Player player;
+    public final Player player;
     private final MovementListener movementListener;
     private final Score score;
+    private final GameEventsManager gameEventsManager;
 
     private final int numCores;
 
     public static int width;
     public static int height;
 
-    ArrayList<GameObject> gameObjects;
+    public ArrayList<GameObject> gameObjects = new ArrayList<>();
+    public ArrayList<Drawable> drawables = new ArrayList<>();
+    public ArrayList<Updatable> updatables = new ArrayList<>();
+
     public static ArrayList<Point> points = new ArrayList<>();
     public static Context context;
+
+    public static final Object locker = new Object();
+    public static final ReentrantLock rlocker = new ReentrantLock();
 
     public Game(Context context) {
         super(context);
@@ -60,8 +71,6 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
         SurfaceHolder surfaceHolder = getHolder();
         surfaceHolder.addCallback(this);
 
-        gameObjects = new ArrayList<>();
-
         movementListener = new MovementListener(context);
         setOnTouchListener(movementListener);
         player = new Player(context, movementListener, R.color.player, width/2f, height-150, 250, 25, 0) {
@@ -72,33 +81,15 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
             }
         };
         gameObjects.add(player);
+        drawables.add(player);
+        updatables.add(player);
 
         int boundColor = R.color.border;
         float woh = 20;
-        Rectangle topBound = new Rectangle(context, boundColor, width/2f, 1, (float) width, woh, 0) {
-            @Override
-            public void update() {
-
-            }
-        };
-        Rectangle leftBound = new Rectangle(context, boundColor, 1, height/2f, woh, (float) height, 0) {
-            @Override
-            public void update() {
-
-            }
-        };
-        Rectangle rightBound = new Rectangle(context, boundColor, width-1, height/2f, woh, (float) height, 0) {
-            @Override
-            public void update() {
-
-            }
-        };
+        Rectangle topBound = new Rectangle(context, boundColor, width/2f, 1, (float) width, woh, 0);
+        Rectangle leftBound = new Rectangle(context, boundColor, 1, height/2f, woh, (float) height, 0);
+        Rectangle rightBound = new Rectangle(context, boundColor, width-1, height/2f, woh, (float) height, 0);
         Rectangle bottomBound = new Rectangle(context, boundColor, width/2f, (float) height-1, (float) width, woh, 0) {
-            @Override
-            public void update() {
-
-            }
-
             @Override
             public void onCollision(GameObject sender, GameObject collisionWith) {
                 gameOver();
@@ -110,17 +101,26 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
         gameObjects.add(rightBound);
         gameObjects.add(bottomBound);
 
-        gameObjects.add(MovingCircle.withRandChars(context, width, height, 50, 1));
-//        gameObjects.add(MovingCircle.withRandChars(context, width, height, 25, 0.25f));
-//        gameObjects.add(MovingCircle.withRandChars(context, width, height, 100, 4f));
-//        gameObjects.add(MovingCircle.withRandChars(context, width, height, 50, 1));
-//        gameObjects.add(MovingCircle.withRandChars(context, width, height, 150, 9));
-//        gameObjects.add(MovingCircle.withRandChars(context, width, height));
-//        gameObjects.add(new MovingCircle(context, R.color.enemy, 300, 200, 50, new Point(0, 10), 1));
-//        gameObjects.add(new MovingCircle(context, R.color.enemy, 300, 1000, 50, new Point(0, 20), 1));
+        drawables.add(topBound);
+        drawables.add(leftBound);
+        drawables.add(rightBound);
+        drawables.add(bottomBound);
+
+        GameObject o = MovingCircle.withRandChars(context, width, height, 50, 1);
+        gameObjects.add(o);
+        drawables.add(o);
+        updatables.add(o);
 
         score = new Score(context, 25, 100);
+        drawables.add(score);
+
         gameLoop = new GameLoop(this, surfaceHolder);
+
+//        gameEventsManager = null;
+        gameEventsManager = new GameEventsManager(this, width-100, 100);
+        drawables.add(gameEventsManager);
+        updatables.add(gameEventsManager);
+
         setFocusable(true);
     }
 
@@ -148,22 +148,23 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public void draw(Canvas canvas) {
-        super.draw(canvas);
-//        drawUPS(canvas);
-//        drawFPS(canvas);
+        synchronized (locker) {
+            rlocker.lock();
+            super.draw(canvas);
 
-        Game.canvas = canvas;
+            Game.canvas = canvas;
 
-        score.draw(canvas);
+            for (Drawable drawable : drawables) {
+                drawable.draw(canvas);
+            }
 
-        for (GameObject gameObject: gameObjects) {
-            gameObject.draw(canvas);
+            for (Point point: points) {
+                point.draw(canvas);
+            }
+
+            points.clear();
+            rlocker.unlock();
         }
-
-        for (Point point: points) {
-            point.draw(canvas);
-        }
-        points.clear();
     }
 
     public static Canvas canvas;
@@ -187,12 +188,16 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void update() {
-        for (GameObject gameObject: gameObjects) {
-            gameObject.update();
-        }
+        synchronized (locker) {
+            rlocker.lock();
+            for (Updatable updatable : updatables) {
+                updatable.update();
+            }
 
-        for (int i = 0; i < gameObjects.size(); i++) {
-            gameObjects.subList(i + 1, gameObjects.size()).parallelStream().forEach(gameObjects.get(i)::collide);
+            for (int i = 0; i < gameObjects.size(); i++) {
+                gameObjects.subList(i + 1, gameObjects.size()).parallelStream().forEach(gameObjects.get(i)::collide);
+            }
+            rlocker.unlock();
         }
     }
 
@@ -204,5 +209,47 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
         intent.putExtra(SCORE_EXTRA, score.getScore());
         context.startActivity(intent);
         ScoresActivity.score = score.getScore();
+    }
+
+    public void addObject(Object o) {
+        synchronized (locker) {
+            rlocker.lock();
+            GameObject go = (GameObject) o;
+            if (go != null) {
+                gameObjects.add(go);
+            }
+            Drawable d = (Drawable) o;
+            if (d != null) {
+                drawables.add(d);
+            }
+            Updatable u = (Updatable) o;
+            if (u != null) {
+                updatables.add(u);
+            }
+            rlocker.unlock();
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void removeObject(Object o) {
+        synchronized (locker) {
+            rlocker.lock();
+            GameObject go = (GameObject) o;
+            if (go != null) {
+                //gameObjects.remove(go);
+                gameObjects.removeIf(i -> i == go);
+            }
+            Drawable d = (Drawable) o;
+            if (d != null) {
+//                drawables.remove(d);
+                gameObjects.removeIf(i -> i == d);
+            }
+            Updatable u = (Updatable) o;
+            if (u != null) {
+//                updatables.remove(u);
+                updatables.removeIf(i -> i == u);
+            }
+            rlocker.unlock();
+        }
     }
 }

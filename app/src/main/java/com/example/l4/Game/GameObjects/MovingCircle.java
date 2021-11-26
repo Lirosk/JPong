@@ -26,12 +26,12 @@ public class MovingCircle extends Circle {
     }
 
     public static MovingCircle withRandChars(Context context, float width, float height) {
-        float movingCircleRadius = Utils.rand(25, 200);
+        float movingCircleRadius = Utils.rand(25, 150);
         float mass = movingCircleRadius/50;
         float movingCircleX = Utils.rand(2.2f*movingCircleRadius, width - 2.2f*movingCircleRadius);
         float movingCircleY = Utils.rand(2.2f*movingCircleRadius, height/2 - 2.2f*movingCircleRadius);
 
-        float movingCircleSpeed = Utils.rand(20, 40);
+        float movingCircleSpeed = Utils.rand(20, 30);
         float movingCircleMovementAngle = Utils.rand((float) (-Math.PI/2f), (float) (Math.PI*1.25f));
 
         float movingCircleVelocityX = (float) (movingCircleSpeed * Math.cos(movingCircleMovementAngle));

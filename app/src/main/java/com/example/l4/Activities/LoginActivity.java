@@ -107,11 +107,11 @@ public class LoginActivity extends AppCompatActivity {
             }
             ScoresActivity.currentUsername = username;
 
-            DBHelper db = new DBHelper(getApplicationContext());
-            if (db.has(username)) {
-                Toast.makeText(this, "Pick another nickname", Toast.LENGTH_SHORT).show();
-                return;
-            }
+//            DBHelper db = new DBHelper(getApplicationContext());
+//            if (db.has(username)) {
+//                Toast.makeText(this, "Pick another nickname", Toast.LENGTH_SHORT).show();
+//                return;
+//            }
 
             Intent intent = new Intent(this, GameActivity.class);
             startActivity(intent);

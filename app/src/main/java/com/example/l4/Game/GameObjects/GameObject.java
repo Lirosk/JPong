@@ -2,12 +2,14 @@ package com.example.l4.Game.GameObjects;
 
 import android.graphics.Canvas;
 
+import com.example.l4.Game.Drawable;
 import com.example.l4.Game.Engine.Game;
 import com.example.l4.Game.Engine.GameLoop;
+import com.example.l4.Game.Updatable;
 import com.example.l4.Point;
 import com.example.l4.Utils;
 
-public abstract class GameObject {
+public abstract class GameObject implements Drawable, Updatable {
     public static final float SPEED_PIXELS_PER_SECOND = 50;
     public static final float MAX_SPEED = SPEED_PIXELS_PER_SECOND / GameLoop.MAX_UPS;
 
@@ -53,12 +55,16 @@ public abstract class GameObject {
         this.velocity = new Point(x, y);
     }
 
+    public Point getVelocity() {
+        return velocity;
+    }
+
     public Point coordinates() {
         return new Point(x, y);
     }
 
     public int moved = 0;
-    public abstract void draw(Canvas canvas);
+//    public abstract void draw(Canvas canvas);
     public static final float ERR_MUL = 10;
 
     public void randomMove() {
@@ -66,6 +72,7 @@ public abstract class GameObject {
         y = Utils.rand(100, Game.height/2f - 100);
     }
 
+    @Override
     public void update() {
         x += velocity.x;
         y += velocity.y;

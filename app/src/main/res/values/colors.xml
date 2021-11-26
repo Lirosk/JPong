@@ -10,8 +10,15 @@
     <color name="red">#FF0000</color>
     <color name="player">@color/white</color>
     <color name="enemy">@color/red</color>
-    <color name="border">#6611ad</color>
+    <color name="purpur">#6611AD</color>
+    <color name="purpurBright">#AA00FF</color>
+    <color name="primary">@color/purpurBright</color>
+    <color name="border">@color/primary</color>
     <color name="blue">#0000FF</color>
     <color name="green">#00FF00</color>
     <color name="point">@color/green</color>
+    <color name="score">@color/white</color>
+    <color name="primaryDark">#232325</color>
+    <color name="gray.0.5">#FF505050</color>
+    <color name="gray0.75">#FFC0C0C0</color>
 </resources>

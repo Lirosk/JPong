@@ -1,4 +1,4 @@
-package com.example.l4.GameObjects;
+package com.example.l4.Game.GameObjects;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -6,9 +6,9 @@ import android.graphics.Paint;
 
 import androidx.core.content.ContextCompat;
 
-import com.example.l4.Engine.Game;
-import com.example.l4.Engine.GameLoop;
-import com.example.l4.GameObjects.Shapes.Circle;
+import com.example.l4.Game.Engine.Game;
+import com.example.l4.Game.Engine.GameLoop;
+import com.example.l4.Game.GameObjects.Shapes.Circle;
 import com.example.l4.Point;
 import com.example.l4.R;
 import com.example.l4.Utils;
@@ -32,7 +32,7 @@ public class MovingCircle extends Circle {
         float movingCircleY = Utils.rand(2.2f*movingCircleRadius, height/2 - 2.2f*movingCircleRadius);
 
         float movingCircleSpeed = Utils.rand(20, 40);
-        float movingCircleMovementAngle = Utils.rand(210, 330);
+        float movingCircleMovementAngle = Utils.rand((float) (-Math.PI/2f), (float) (Math.PI*1.25f));
 
         float movingCircleVelocityX = (float) (movingCircleSpeed * Math.cos(movingCircleMovementAngle));
         float movingCircleVelocityY = (float) (movingCircleSpeed * Math.sin(movingCircleMovementAngle));
@@ -66,7 +66,7 @@ public class MovingCircle extends Circle {
     @Override
     public void update() {
 //        setVelocityY(velocity.y);
-        velocity = new Point(velocity.x, velocity.y + Math.abs(velocity.y*0.01f));
+        velocity = new Point(velocity.x, velocity.y + 1f/GameLoop.UPS_PERIOD);
         super.update();
     }
 }

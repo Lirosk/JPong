@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">l4</string>
+    <string name="score">score</string>
+    <string name="leaderboard">leaderboard</string>
+    <string name="login">login</string>
+    <string name="username">username</string>
 </resources>

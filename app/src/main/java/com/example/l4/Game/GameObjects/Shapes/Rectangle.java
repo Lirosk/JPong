@@ -1,9 +1,9 @@
-package com.example.l4.GameObjects.Shapes;
+package com.example.l4.Game.GameObjects.Shapes;
 
 import android.content.Context;
 import android.graphics.Canvas;
 
-import com.example.l4.Engine.Game;
+import com.example.l4.Game.Engine.Game;
 import com.example.l4.Point;
 
 public class Rectangle extends Shape {

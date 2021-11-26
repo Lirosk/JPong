@@ -1,12 +1,11 @@
-package com.example.l4.GameObjects.Shapes;
+package com.example.l4.Game.GameObjects.Shapes;
 
 import android.content.Context;
 import android.graphics.Paint;
 
 import androidx.core.content.ContextCompat;
 
-import com.example.l4.GameObjects.GameObject;
-import com.example.l4.Point;
+import com.example.l4.Game.GameObjects.GameObject;
 
 public abstract class Shape extends GameObject {
     protected final Paint paint;

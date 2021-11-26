@@ -1,15 +1,15 @@
-package com.example.l4.GameObjects;
+package com.example.l4.Game.GameObjects;
 
 import android.content.Context;
 
-import com.example.l4.Engine.Game;
-import com.example.l4.Engine.GameLoop;
-import com.example.l4.GameObjects.Shapes.Rectangle;
+import com.example.l4.Game.Engine.Game;
+import com.example.l4.Game.Engine.GameLoop;
+import com.example.l4.Game.GameObjects.Shapes.Rectangle;
 import com.example.l4.Listeners.MovementListener;
 import com.example.l4.Point;
 
 public class Player extends Rectangle {
-    public static final float SPEED_PIXELS_PER_SECOND = 600;
+    public static final float SPEED_PIXELS_PER_SECOND = 700;
     public static final float MAX_SPEED = SPEED_PIXELS_PER_SECOND / GameLoop.MAX_UPS;
     private final MovementListener movementListener;
 

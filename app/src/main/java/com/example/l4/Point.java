@@ -1,15 +1,11 @@
 package com.example.l4;
 
-import android.annotation.SuppressLint;
-import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.os.Build;
 
-import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 
-import com.example.l4.Engine.Game;
+import com.example.l4.Game.Engine.Game;
 
 public class Point {
     public final float x;

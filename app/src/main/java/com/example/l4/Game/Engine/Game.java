@@ -1,14 +1,13 @@
-package com.example.l4.Engine;
+package com.example.l4.Game.Engine;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.os.Build;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Display;
-import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -16,14 +15,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 
-import com.example.l4.GameObjects.GameObject;
-import com.example.l4.GameObjects.MovingCircle;
-import com.example.l4.GameObjects.Player;
-import com.example.l4.GameObjects.Shapes.Rectangle;
+import com.example.l4.Activities.ScoresActivity;
+import com.example.l4.Game.GameObjects.GameObject;
+import com.example.l4.Game.GameObjects.MovingCircle;
+import com.example.l4.Game.GameObjects.Player;
+import com.example.l4.Game.GameObjects.Shapes.Rectangle;
 import com.example.l4.Listeners.MovementListener;
 import com.example.l4.Point;
 import com.example.l4.R;
-import com.example.l4.Utils;
+import com.example.l4.Game.Score;
 
 import java.util.ArrayList;
 
@@ -33,7 +33,7 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
     private final GameLoop gameLoop;
     private final Player player;
     private final MovementListener movementListener;
-    private final MovingCircle movingCircle;
+    private final Score score;
 
     private final int numCores;
 
@@ -64,7 +64,13 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
 
         movementListener = new MovementListener(context);
         setOnTouchListener(movementListener);
-        player = new Player(context, movementListener, R.color.player, width/2f, height-150, 250, 25, 0);
+        player = new Player(context, movementListener, R.color.player, width/2f, height-150, 250, 25, 0) {
+            @Override
+            public void onCollision(GameObject sender, GameObject collisionWith) {
+                super.onCollision(sender, collisionWith);
+                score.inc();
+            }
+        };
         gameObjects.add(player);
 
         int boundColor = R.color.border;
@@ -92,6 +98,11 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
             public void update() {
 
             }
+
+            @Override
+            public void onCollision(GameObject sender, GameObject collisionWith) {
+                gameOver();
+            }
         };
 
         gameObjects.add(topBound);
@@ -99,15 +110,16 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
         gameObjects.add(rightBound);
         gameObjects.add(bottomBound);
 
-        movingCircle = MovingCircle.withRandChars(context, width, height);
+        gameObjects.add(MovingCircle.withRandChars(context, width, height, 50, 1));
 //        gameObjects.add(MovingCircle.withRandChars(context, width, height, 25, 0.25f));
 //        gameObjects.add(MovingCircle.withRandChars(context, width, height, 100, 4f));
 //        gameObjects.add(MovingCircle.withRandChars(context, width, height, 50, 1));
 //        gameObjects.add(MovingCircle.withRandChars(context, width, height, 150, 9));
 //        gameObjects.add(MovingCircle.withRandChars(context, width, height));
-//        gameObjects.add(MovingCircle.withRandChars(context, width, height));
-        gameObjects.add(movingCircle);
+//        gameObjects.add(new MovingCircle(context, R.color.enemy, 300, 200, 50, new Point(0, 10), 1));
+//        gameObjects.add(new MovingCircle(context, R.color.enemy, 300, 1000, 50, new Point(0, 20), 1));
 
+        score = new Score(context, 25, 100);
         gameLoop = new GameLoop(this, surfaceHolder);
         setFocusable(true);
     }
@@ -141,6 +153,8 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
 //        drawFPS(canvas);
 
         Game.canvas = canvas;
+
+        score.draw(canvas);
 
         for (GameObject gameObject: gameObjects) {
             gameObject.draw(canvas);
@@ -180,5 +194,15 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
         for (int i = 0; i < gameObjects.size(); i++) {
             gameObjects.subList(i + 1, gameObjects.size()).parallelStream().forEach(gameObjects.get(i)::collide);
         }
+    }
+
+    public static final String SCORE_EXTRA = "com.example.l4.SCORE";
+    public void gameOver() {
+        gameLoop.interrupt();
+//        gameLoop.join();
+        Intent intent = new Intent(context, ScoresActivity.class);
+        intent.putExtra(SCORE_EXTRA, score.getScore());
+        context.startActivity(intent);
+        ScoresActivity.score = score.getScore();
     }
 }

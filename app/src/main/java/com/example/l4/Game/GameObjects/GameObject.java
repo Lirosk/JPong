@@ -1,11 +1,9 @@
-package com.example.l4.GameObjects;
+package com.example.l4.Game.GameObjects;
 
 import android.graphics.Canvas;
 
-import com.example.l4.Engine.Game;
-import com.example.l4.Engine.GameLoop;
-import com.example.l4.GameObjects.Shapes.Circle;
-import com.example.l4.GameObjects.Shapes.Rectangle;
+import com.example.l4.Game.Engine.Game;
+import com.example.l4.Game.Engine.GameLoop;
 import com.example.l4.Point;
 import com.example.l4.Utils;
 
@@ -155,6 +153,10 @@ public abstract class GameObject {
             Game.points.add(p2);
 
             synchronized (locker) {
+
+                onCollision(this, gameObject);
+                gameObject.onCollision(gameObject, this);
+
                 // momentum conservation law
                 float vx1 = velocity.x;
                 float vy1 = velocity.y;
@@ -178,19 +180,21 @@ public abstract class GameObject {
                 Point x2 = gameObject.coordinates();
 
                 float rx1 = vx1, ry1 = vy1, rx2 = vx2, ry2 = vy2;
-                float phi = (float) Math.abs(surfaceAngle(p1)-theta2);
+//                float phi = (float) Math.abs(surfaceAngle(p1)-theta2);
+                float phi = (float) (Math.abs(surfaceAngle(p1)));
 
                 if (m1 == 0) {
-                    phi = surfaceAngle(p1);
+                    phi = (float) (Math.abs(surfaceAngle(p1)));
+
                     if (Math.abs(phi) < Game.ERR) {
                         ry2 = -vy2;
                     }
                     else if (Math.abs(Math.abs(phi) - Math.PI/2) < Game.ERR) {
                         rx2 = - vx2;
                     }
-//                    float rlen = (float) (vl2*Math.sqrt(m1*m1+m2*m2+2*m1*m2*Math.cos(phi)))/(m1+m2);
-//                    vx2 = (float) (rlen * Math.cos(phi));
-//                    vy2 = (float) (rlen * Math.sin(phi));
+
+                    float dpi = 0;
+
                 } else if (m2 == 0) {
                     phi = surfaceAngle(p2);
                     if (Math.abs(phi) < Game.ERR) {
@@ -199,29 +203,32 @@ public abstract class GameObject {
                     else if (Math.abs(Math.abs(phi) - Math.PI/2) < Game.ERR) {
                         rx1 = -vx1;
                     }
-//                    float rlen = (float) (vl1*Math.sqrt(m1*m1+m2*m2+2*m1*m2*Math.cos(phi)))/(m1+m2);
-//                    vx1 = (float) (rlen * Math.cos(phi));
-//                    vy1 = (float) (rlen * Math.sin(phi));
                 } else {
                     double a1 = vl1*Math.cos(theta1-phi)*(m1-m2)+2*m2*vl2*Math.cos(theta2-phi);
-                    rx1 = (float)(
-//                        a1
+
+
+//                    rx1 = (float)(
+//                            a1
 //                        *Math.cos(phi)
 //                        /(m1+m2)
 //                        +vl1*Math.sin(theta1-phi)*Math.cos(phi+Math.PI/2)
-
+//                            );
+                    rx1 = (float)(
                     (
                         a1
                         *Math.cos(phi)
                         +vl1*Math.sin(theta1-phi)*Math.cos(phi+Math.PI/2)
                     )/(m1 + m2)
                     );
-                    ry1 = (float)(
-//                        a1
-//                        *Math.sin(phi)
-//                        /(m1+m2)
-//                        +vl1*Math.sin(theta1-phi)*Math.sin(phi+Math.PI/2)
 
+
+//                    ry1 = (float)(
+//                            a1
+//                                    *Math.sin(phi)
+//                                    /(m1+m2)
+//                                    +vl1*Math.sin(theta1-phi)*Math.sin(phi+Math.PI/2)
+//                            );
+                    ry1 = (float)(
                             (
                                     a1
                                     *Math.sin(phi)
@@ -229,25 +236,32 @@ public abstract class GameObject {
                             ) / (m1 + m2)
                     );
 
-                    double a2 = vl2*Math.cos(theta2-phi)*(m2-m1)+2*m1*vl1*Math.cos(theta1-phi);
-                    rx2 = (float)(
-//                        a2
-//                        *Math.cos(phi)
-//                        /(m1+m2)
-//                        +vl2*Math.sin(theta2-phi)*Math.cos(phi+Math.PI/2)
 
+                    double a2 = vl2*Math.cos(theta2-phi)*(m2-m1)+2*m1*vl1*Math.cos(theta1-phi);
+
+
+//                    rx2 = (float)(
+//                            a2
+//                                    *Math.cos(phi)
+//                                    /(m1+m2)
+//                                    +vl2*Math.sin(theta2-phi)*Math.cos(phi+Math.PI/2)
+//                            );
+                    rx2 = (float)(
                             (
                                     a2
                                     *Math.cos(phi)
                                     +vl2*Math.sin(theta2-phi)*Math.cos(phi+Math.PI/2)
                             ) / (m1+m2)
                     );
-                    ry2 = (float)(
-//                        a2
-//                        *Math.sin(phi)
-//                        /(m1+m2)
-//                        +vl2*Math.sin(theta2-phi)*Math.sin(phi+Math.PI/2)
 
+
+//                    ry2 = (float)(
+//                            a2
+//                                    *Math.sin(phi)
+//                                    /(m1+m2)
+//                                    +vl2*Math.sin(theta2-phi)*Math.sin(phi+Math.PI/2)
+//                            );
+                    ry2 = (float)(
                     (
                             a2
                             *Math.sin(phi)
@@ -270,21 +284,25 @@ public abstract class GameObject {
                 gameObject.velocity = rv2;
 
                 while (collides(gameObject) || gameObject.collides(this)) {
-                    if (m1 != 0) {
-                        this.update();
-                    }
+//                    if (m1 != 0) {
+//                        this.update();
+//                    }
                     if (m2 != 0) {
                         gameObject.update();
                     }
-                    moved++;
-                    if (moved > 100) {
-                        gameObject.randomMove();
-                        moved = 0;
-                    }
+//                    moved++;
+//                    if (moved > 100) {
+//                        gameObject.randomMove();
+//                        moved = 0;
+//                    }
                 }
-                moved = 0;
+//                moved = 0;
             }
         }
+    }
+
+    public void onCollision(GameObject sender, GameObject collisionWith) {
+
     }
 
     public float getVelocityX() {

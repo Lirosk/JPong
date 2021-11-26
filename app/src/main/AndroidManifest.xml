@@ -10,7 +10,19 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.L4">
         <activity
-            android:name=".MainActivity"
+            android:name=".Activities.LoginActivity"
+            android:exported="false"
+            android:theme="@style/AppFullScreen" />
+        <activity
+            android:name=".Activities.ScoresActivity"
+            android:exported="false"
+            android:theme="@style/AppFullScreen" />
+        <activity
+            android:name=".Activities.GameActivity"
+            android:exported="false"
+            android:theme="@style/AppFullScreen" />
+        <activity
+            android:name=".Activities.MainActivity"
             android:exported="true"
             android:theme="@style/AppFullScreen">
             <intent-filter>

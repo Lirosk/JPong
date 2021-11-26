@@ -1,4 +1,4 @@
-package com.example.l4.Engine;
+package com.example.l4.Game.Engine;
 
 import android.graphics.Canvas;
 import android.os.Build;
@@ -6,7 +6,7 @@ import android.view.SurfaceHolder;
 
 import androidx.annotation.RequiresApi;
 
-import com.example.l4.Engine.Game;
+import com.example.l4.Game.Engine.Game;
 
 public class GameLoop extends Thread{
     public static final float MAX_UPS = 30;
@@ -124,5 +124,11 @@ public class GameLoop extends Thread{
 
     public double getAverageFPS() {
         return averageFPS;
+    }
+
+    @Override
+    public void interrupt() {
+        isRunning = false;
+        super.interrupt();
     }
 }
